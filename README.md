@@ -1,54 +1,50 @@
-# RISC Zero Rust Starter Template
+# Luna-RISC0: Trust-Minimized Security Background Investigation
+## Synopsis
+"Gilbert" is applying to be a partisan trying to overthrow the tyrannical Lunar Authority (science fiction, _The Moon is a Harsh Mistress_ by Robert A. Heinlein). He gathers various digital signatures on his Background Security Investigation document (I), and supplies (II) a `duress` boolean saying, in effect, "I'm compromised; don't trust me."
+He then feeds these two sets of information into his local copy of the RISC Zero program supplied by the Party, which outputs a cryptographically verifiable decision on whether to admit him.
 
-Welcome to the RISC Zero Rust Starter Template! This template is intended to give you a starting point for building a project using the RISC Zero zkVM. Throughout the template (including in this README), you'll find comments labelled `TODO` in places where you'll need to make changes.
-To better understand the concepts behind this template, check out our [Structure of a zkVM Application] explainer.
+## Details
+ The Party verifier knows based on the proof which of the following two conditions applies:
+- All signatures on the Background Investigation are correct, and `duress` is false. (Alternative Hypothesis)
+OR
+- `duress` is true, or not all required signatures on the Background Investigation can be validated (Null Hypothesis)
 
->TODO: Replace this README with a README for your project
+Note that the verifier doesn't see the Background Investigation or the `duress` variable themselves.
 
->TODO: Verify whether the included `.gitignore`, `LICENSE`, and `rust-toolchain` files are appropriate to your project
+### Public Inputs
+- Adam Selene's public key (i.e. the Root of Trust)
+- A representation of Gilbert's identity, such as a public key, or key fingerprint
 
-## Quick Start
+### Private Inputs
+- `duress` variable
+- Most keys/signatures by witnesses/neighbors (Not yet implemented). Ultimately, we'd like to have the full certificate chain available for each signer of the Security Background Investigation. As a simplifying assumption, we currently require that each candidate is approved directly by Adam Selene, the computer who manages Party activities.
 
-First, make sure [rustup](https://rustup.rs) is installed. This project uses a [nightly](https://doc.rust-lang.org/book/appendix-07-nightly-rust.html) version of [Rust](https://doc.rust-lang.org/book/ch01-01-installation.html). The [`rust-toolchain`](rust-toolchain) file will be used by `cargo` to automatically install the correct version.
+### Public Outputs
+- `is_trustworthy`, representing whether "Gilbert" should be admitted to the Party
+- Additionally, we echo the Public Inputs for the sake of verifiability. The RISC Zero API may have a better alternative to this approach.
 
-To build all methods and execute the method within the zkVM, run the following command:
-
+## Building & Running
+Checkout the source tree, and change to the source tree directory. You will need to install the Protocol Buffers compiler (`protoc`), and the Rust plugin for `protoc`. From `luna-risc0/sec_investigation/src/`, run `protoc --rust_out . sec_investigation.proto`. Then do `cargo run`. After several minutes, you should see something like the following:
 ```
-cargo run
+=====================================================================================
+= Luna shall be free! Please transmit proof of your Party Security Investigation.
+=====================================================================================
+
+******************************************************************************************
+* Security investigation RESULT: is_trustworthy == true
+*
+* Public inputs:
+* --------------
+* Message: "Party name: 'Gilbert' is approved by Adam Selene for party membership."
+* Key: 033F690F9CF7D18C43085DF78916E4E37F459E1350B339CA3DBE93944AE75C201F
+******************************************************************************************
 ```
 
-This is an empty template, and so there is no expected output (until you modify the code).
-
-### Running proofs remotely on Bonsai
-
-*Note: The Bonsai proving service is still in early Alpha; an API key is required for access. [Click here to request access].*
-
-If you have access to the URL and API key to Bonsai you can run your proofs
-remotely. To prove in Bonsai mode, invoke `cargo run` with two additional
-environment variables:
-
-```
-BONSAI_API_KEY="YOUR_API_KEY" BONSAI_API_URL="BONSAI_URL" cargo run
-```
-
-[Click here to request access]: https://bonsai.xyz/apply
-
-## How to create a project based on this template
-
-Search this template for the string `TODO`, and make the necessary changes to implement the required feature described by the `TODO` comment. Some of these changes will be complex, and so we have a number of instructional resources to assist you in learning how to write your own code for the RISC Zero zkVM:
- * The [RISC Zero Developer Docs](https://dev.risczero.com/zkvm) is a great place to get started.
- * Example projects are available in the [examples folder](https://github.com/risc0/risc0/tree/main/examples) of this repository.
- * Reference documentation for our Rust crates is available at [docs.rs], including the [RISC Zero zkVM crate](https://docs.rs/risc0-zkvm), the [cargo risczero crate](https://docs.rs/cargo-risczero), the [RISC Zero build crate](https://docs.rs/risc0-build), and others (the full list is available at [https://github.com/risc0/risc0/blob/main/README.md]).
- * Our [main repository](https://www.github.com/risc0/risc0).
-
-
-## Contributor's Guide
-We welcome contributions to documentation and code via PRs and GitHub Issues on our [main repository](http://www.github.com/risc0) or any of our other repositories.
-
-## Video Tutorial
-For a walk-through of how to build with this template, check out this [excerpt from our workshop at ZK HACK III](https://www.youtube.com/watch?v=Yg_BGqj_6lg&list=PLcPzhUaCxlCgig7ofeARMPwQ8vbuD6hC5&index=5).
-
-## Questions, Feedback, and Collaborations
-We'd love to hear from you on [Discord](https://discord.gg/risczero) or [Twitter](https://twitter.com/risczero).
-
-[Structure of a zkVM Application]: https://dev.risczero.com/zkvm/developer-guide/zkvm-app-structure
+## Possible Enhancements
+A more complete Security Background Investigation would include some of the following:
+- Support a chain of trust signatures. For example, Adam can sign Dylan's public key, and Dylan can sign Gilbert's public key.
+- Establish history of the person's identity. Any time they interacted with credible witnesses/neighbors, that's an event that could be used to validate that they didn't invent their persona. Photographic + name comparisons are preferable to name only.
+- AI/ML analysis of biometric inputs (photos, fingerprints, etc.)
+- Graph analysis of the trustworthiness of the people attesting to the applicant's loyalties, which could use Personalized PageRank, or other forms of recursion.
+- Multiple signatures, each one representing a witness (for example, who attests that the applicant lived at the address(es) he/she claims)
+- Recursive proofs/signatures could be used, particularly when incorporating outputs from ML systems.
