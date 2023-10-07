@@ -36,16 +36,18 @@ pub fn main() {
 
 fn ecdsa_demo() {
     // Decode the verifying key, message, and signature from the inputs.
-    let (encoded_verifying_key, message, signature): (EncodedPoint, Vec<u8>, Signature) =
+    let (duress, encoded_verifying_key, message, signature): (bool, EncodedPoint, Vec<u8>, Signature) =
         env::read();
     let verifying_key = VerifyingKey::from_encoded_point(&encoded_verifying_key).unwrap();
 
-    // Verify the signature, panicking if verification fails.
-    verifying_key
-        .verify(&message, &signature)
-        .expect("ECDSA signature verification failed");
+    let good_signature = verifying_key
+        .verify(&message, &signature).is_ok();
 
-    // Commit to the journal the verifying key and message that was signed.
-    env::commit(&(encoded_verifying_key, message));
+    // Do signature verification, and also support duress functionality
+    let is_trustworthy = good_signature && !duress;
+
+    // Commit to the journal the result of the background investigation.
+    // Echoing the public inputs is a form of protection against tampering.
+    env::commit(&(is_trustworthy, encoded_verifying_key, message));
 }
 ////////////////////////////////////////////////////////////////////////////////

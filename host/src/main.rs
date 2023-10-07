@@ -41,6 +41,9 @@ fn zkvm_template_main() {
 }
 
 fn main() {
+    println!("\n=====================================================================================");
+    println!("= Luna shall be free! Please transmit proof of your Party Security Investigation.");
+    println!("=====================================================================================\n");
     ecdsa_host_demo();
 }
 
@@ -62,16 +65,14 @@ fn main() {
 // limitations under the License.
 
 
-/// Given an secp256k1 verifier key (i.e. public key), message and signature,
-/// runs the ECDSA verifier inside the zkVM and returns a receipt, including a
-/// journal and seal attesting to the fact that the prover knows a valid
-/// signature from the committed public key over the committed message.
-fn prove_ecdsa_verification(
+fn prove_security_investigation(
+    duress: bool,
     verifying_key: &VerifyingKey,
     message: &[u8],
     signature: &Signature,
 ) -> Receipt {
     let env = ExecutorEnv::builder()
+        .add_input(&to_vec(&duress).unwrap())
         .add_input(&to_vec(&(verifying_key.to_encoded_point(true), message, signature)).unwrap())
         .build()
         .unwrap();
@@ -86,24 +87,32 @@ fn prove_ecdsa_verification(
 fn ecdsa_host_demo() {
     // Generate a random secp256k1 keypair and sign the message.
     let signing_key = SigningKey::random(&mut OsRng); // Serialize with `::to_bytes()`
-    let message = b"This is a message that will be signed, and verified within the zkVM";
+    let message = b"Party name: 'Gilbert' is approved by Adam Selene for party membership.";
     let signature: Signature = signing_key.sign(message);
 
+    // Applicant: Set to true if you are compromised or under duress by Lunar Authority
+    let duress = false;
+
     // Run signature verified in the zkVM guest and get the resulting receipt.
-    let receipt = prove_ecdsa_verification(signing_key.verifying_key(), message, &signature);
+    let receipt = prove_security_investigation(duress, signing_key.verifying_key(), message, &signature);
 
     // Verify the receipt and then access the journal.
     receipt.verify(LUNA_ID).unwrap();
-    let (receipt_verifying_key, receipt_message) =
-        from_slice::<(EncodedPoint, Vec<u8>), _>(&receipt.journal)
+    let (is_trustworthy, receipt_verifying_key, receipt_message) =
+        from_slice::<(bool, EncodedPoint, Vec<u8>), _>(&receipt.journal)
             .unwrap()
             .try_into()
             .unwrap();
 
-    println!(
-        "Verified the signature over message {:?} with key {}",
+    println!("******************************************************************************************");
+    println!("* Security investigation RESULT: is_trustworthy == {}", is_trustworthy);
+    println!("*");
+    println!("* Public inputs:");
+    println!("* --------------");
+    println!("* Message: {:?}\n* Key: {}",
         std::str::from_utf8(&receipt_message[..]).unwrap(),
         receipt_verifying_key,
     );
+    println!("******************************************************************************************");
 }
 ////////////////////////////////////////////////////////////////////////////////
