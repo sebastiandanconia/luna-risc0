@@ -9,7 +9,6 @@ edition = "2021"
 [dependencies]
 # If you want to try (experimental) std support, add `features = [ "std" ]` to risc0-zkvm
 risc0-zkvm = { version = "0.17.0", default-features = false, features = [ "std" ] }
-protobuf = { version = "3.3.0", features = ["with-bytes"] }
 hex-literal = "0.4"
 k256 = { version = "=0.13.1", features = ["arithmetic", "serde", "expose-field", "std", "ecdsa"], default_features = false }
 
