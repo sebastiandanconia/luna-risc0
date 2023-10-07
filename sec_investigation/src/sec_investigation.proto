@@ -1,0 +1,26 @@
+syntax = "proto3";
+
+message Signature {
+  optional string key_fingerprint = 1;
+  optional bytes signature = 2;
+}
+
+message Person {
+  optional string name = 1;
+  optional string key_fingerprint = 2;
+  optional bytes key_pub = 3;
+  repeated Signature signatures = 6;
+}
+
+message TrustDB {
+  repeated Person people = 5;
+}
+
+// Think of this as a recipe or To-Do list for verifying a signature chain.
+// However we still need the public keys from the TrustDB, which are the "message" verified by
+// the previous-level signature.
+message TrustChain {
+  // We need a chain of key fingerprints for this to make any sense, however
+  // signatures[i].signature can be optional.
+  repeated Signature signatures = 5;
+}

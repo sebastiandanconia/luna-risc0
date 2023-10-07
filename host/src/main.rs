@@ -11,6 +11,8 @@ use risc0_zkvm::{
     ExecutorEnv, Receipt,
 };
 
+use sec_investigation::*;
+
 fn zkvm_template_main() {
     // First, we construct an executor environment
     let env = ExecutorEnv::builder().build().unwrap();

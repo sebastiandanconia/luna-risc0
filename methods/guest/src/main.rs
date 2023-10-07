@@ -8,6 +8,8 @@ use k256::{
 };
 use risc0_zkvm::guest::env;
 
+use sec_investigation::*;
+
 risc0_zkvm::guest::entry!(main);
 
 pub fn main() {

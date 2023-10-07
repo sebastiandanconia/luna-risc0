@@ -11,6 +11,7 @@ edition = "2021"
 risc0-zkvm = { version = "0.17.0", default-features = false, features = [ "std" ] }
 hex-literal = "0.4"
 k256 = { version = "=0.13.1", features = ["arithmetic", "serde", "expose-field", "std", "ecdsa"], default_features = false }
+sec_investigation = { path = "../../sec_investigation" }
 
 [patch.crates-io]
 # Placing these patch statement in the workspace Cargo.toml will add RISC Zero SHA-256 and bigint

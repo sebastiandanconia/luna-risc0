@@ -10,6 +10,7 @@ serde = "1.0"
 #clap = "4.4"
 k256 = { version = "0.13", features = ["serde"] }
 rand_core = "0.6.4"
+sec_investigation = { path = "../sec_investigation" }
 
 [features]
 cuda = ["risc0-zkvm/cuda"]
